@@ -26,8 +26,6 @@ public class BadAnsweredTriviaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bad_answered_trivia);
-
-
         videoview = (VideoView) findViewById(R.id.videoView1);
 
         videoview.setVideoPath(

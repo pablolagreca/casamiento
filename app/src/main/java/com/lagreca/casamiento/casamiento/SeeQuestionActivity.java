@@ -86,7 +86,36 @@ public class SeeQuestionActivity extends AppCompatActivity {
         if (!moreQuestions) {
             if (incorrectAnswers > 0)
             {
+                final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Burrooooo!").setMessage("El codigo secreto no es valido. \nHasta no contestar bien no podras ver el mensaje secreto.");
+//                dialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int whichButton) {
+//                        exitDialogWrongAnswers();
+//                    }
+//                });
+                final AlertDialog alert = dialog.create();
+                alert.show();
 
+// Hide after some seconds
+                final Handler handler  = new Handler();
+                final Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (alert.isShowing()) {
+                            alert.dismiss();
+                            exitDialogWrongAnswers();
+                        }
+                    }
+                };
+
+                alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        handler.removeCallbacks(runnable);
+                    }
+                });
+
+                handler.postDelayed(runnable, 5000);
             }
             else
             {
