@@ -18,7 +18,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".SeeQuestionActivity" />
-        <activity android:name=".SuccessfulTriviaActivity" />
         <activity
             android:name=".BadAnsweredTriviaActivity"
             android:label="@string/title_activity_bad_answered_trivia"
@@ -29,6 +28,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".SuccessfulAnswerTriviaActivity"></activity>
     </application>
 
 </manifest>

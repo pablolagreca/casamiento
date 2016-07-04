@@ -1,42 +1,64 @@
 package com.lagreca.casamiento.casamiento;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 public class SeeQuestionActivity extends AppCompatActivity {
 
-    private static final int NUMBER_OF_QUESTIONS_TO_ASK = 5;
+    private static final int NUMBER_OF_QUESTIONS_TO_ASK = 3;
 
     private Question currentQuestion;
     private int nextQuestionIndex = 0;
     private int incorrectAnswers = 0;
 
-    private static Question[] questions = new Question[]
+    private final List<Integer> photoIdentifiers = new ArrayList<>();
+
+    private void recreatePhotoIdentifiers() {
+        photoIdentifiers.add(R.drawable.foto1);
+        photoIdentifiers.add(R.drawable.foto2);
+        photoIdentifiers.add(R.drawable.foto3);
+        photoIdentifiers.add(R.drawable.foto4);
+        Collections.shuffle(photoIdentifiers);
+    }
+
+    private Question[] questions = new Question[]
             {
-                    new Question("Cuantas pijas le entran en la cola a la novia", new Answer("1"), new Answer("2"), new Answer("3", true)),
-                    new Question("A la novia, le gusta escupir o tragar", new Answer("Tragar"), new Answer("Escupir", true)),
-                    new Question("Cuanto tardo en entregar la novia?. 1 minuto? 10 minutos? 1 hora?", new Answer("1"), new Answer("2"), new Answer("3", true))
+                    new Question("¿En que lugar se conocieron los novios?", new Answer("Boliche"), new Answer("Colacion"), new Answer("Cumpleaños", true)),
+                    new Question("¿En que año se conocieron los novios?", new Answer("2002"), new Answer("2006"), new Answer("2008", true)),
+                    new Question("¿Que disfrutan hacer los novios en su tiempo libre?", new Answer("Ver peliculas", true), new Answer("Ir a bailar"), new Answer("Salir a comer")),
+                    new Question("¿Cual es el lugar preferido para vacacionar de los novios?", new Answer("Playa", true), new Answer("Montaña"), new Answer("Nieve")),
+                    new Question("¿Quien ficho a quien?", new Answer("Pablo a Noelia"), new Answer("Noelia a Pablo", true), new Answer("Ambos a la vez")),
+                    new Question("¿Como llama el novio a la novia cariñosamente?", new Answer("Pupi"), new Answer("Mamu", true), new Answer("Chuli")),
+                    new Question("¿Como se llaman las madres de los novios?", new Answer("Julia y Raquel"), new Answer("Liliana y Beatriz"), new Answer("Raquel y Julia"), new Answer("Liliana y Raquel", true)),
+                    new Question("¿Cuantos años hace que se conoce la pareja?", new Answer("6"), new Answer("7"), new Answer("8", true)),
+                    new Question("¿Donde fue la primera salida de los novios?", new Answer("Al cine", true), new Answer("A cenar"), new Answer("A bailar")),
+                    new Question("¿Que tipo de comida prefieren los novios?", new Answer("China"), new Answer("Arabe"), new Answer("Mexicana", true)),
             };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        shuffleArray(questions);
         setContentView(R.layout.activity_see_question);
-        addNextQuestion();
+        recreatePhotoIdentifiers();
+        addNextQuestionAndReturnIfThereAreMoreQuestions();
 
     }
 
-    private boolean addNextQuestion() {
-        if (nextQuestionIndex >= questions.length)
+    private boolean addNextQuestionAndReturnIfThereAreMoreQuestions() {
+        if (nextQuestionIndex >= questions.length || nextQuestionIndex >= NUMBER_OF_QUESTIONS_TO_ASK)
         {
             return false;
         }
@@ -45,6 +67,9 @@ public class SeeQuestionActivity extends AppCompatActivity {
         questionTextView.setText(currentQuestion.getText());
         LinearLayout canvasLinearLayout = (LinearLayout)findViewById(R.id.buttonLayout);
         canvasLinearLayout.removeAllViews();
+
+        setBackgroundImage();
+
         for (Answer answer : currentQuestion.getAnswers()) {
             Button button = new Button(this);
             button.setTextColor(Color.WHITE);
@@ -52,7 +77,6 @@ public class SeeQuestionActivity extends AppCompatActivity {
             LinearLayout buttonLinearLayout = new LinearLayout(this);
             LinearLayout.LayoutParams buttonLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             buttonLinearLayout.addView(button, buttonLayoutParams);
-
             canvasLinearLayout.addView(buttonLinearLayout);
             if (answer.isCorrect())
             {
@@ -76,58 +100,47 @@ public class SeeQuestionActivity extends AppCompatActivity {
         return true;
     }
 
+    private void setBackgroundImage() {
+        ImageView imageView = (ImageView) findViewById(R.id.questionFoto);
+        imageView.setImageResource(photoIdentifiers.get(nextQuestionIndex));
+    }
+
     private void questionIncorrectlyAnswered(View view) {
         incorrectAnswers++;
         processNextQuestionOrTriviaResult();
     }
 
     private void processNextQuestionOrTriviaResult() {
-        boolean moreQuestions = addNextQuestion();
+        boolean moreQuestions = addNextQuestionAndReturnIfThereAreMoreQuestions();
         if (!moreQuestions) {
             if (incorrectAnswers > 0)
             {
-                final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Burrooooo!").setMessage("El codigo secreto no es valido. \nHasta no contestar bien no podras ver el mensaje secreto.");
-//                dialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int whichButton) {
-//                        exitDialogWrongAnswers();
-//                    }
-//                });
-                final AlertDialog alert = dialog.create();
-                alert.show();
+                incorrectAnswers = 0;
+                nextQuestionIndex = 0;
+                Intent intent = new Intent(this, BadAnsweredTriviaActivity.class);
+                startActivity(intent);
 
-// Hide after some seconds
-                final Handler handler  = new Handler();
-                final Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (alert.isShowing()) {
-                            alert.dismiss();
-                            exitDialogWrongAnswers();
-                        }
-                    }
-                };
-
-                alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        handler.removeCallbacks(runnable);
-                    }
-                });
-
-                handler.postDelayed(runnable, 5000);
             }
             else
             {
-                Intent intent = new Intent(this, SuccessfulTriviaActivity.class);
+                Intent intent = new Intent(this, SuccessfulAnswerTriviaActivity.class);
                 startActivity(intent);
             }
         }
     }
 
-    private void exitDialogWrongAnswers() {
-        Intent intent = new Intent(this, BadAnsweredTriviaActivity.class);
-        startActivity(intent);
+    static void shuffleArray(Question[] ar)
+    {
+        // If running on Java 6 or older, use `new Random()` on RHS here
+        Random rnd = new Random();
+        for (int i = ar.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            Question a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+        }
     }
 
     public void questionCorrectlyAnswered(View view) {
