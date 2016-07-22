@@ -19,11 +19,17 @@ public class BadAnsweredTriviaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bad_answered_trivia);
 
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Burrooooo!").setMessage("El codigo secreto no es valido. \nHasta no contestar bien no podras ver el mensaje secreto.");
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Respuesta/s incorrectas!!!!").setMessage("Lamentablemente no conoces a los novios lo suficiente. \nHasta no contestar bien no podras ver el mensaje secreto. Volve a intentarlo!");
         final AlertDialog alert = dialog.create();
         alert.show();
-        MediaPlayer mPlayer = MediaPlayer.create(this, R.raw.sosburro);
-        mPlayer.start();
+
+        new SoundProducer(this, R.raw.fallochiste).onComplete(new Runnable() {
+            @Override
+            public void run() {
+                new SoundProducer(BadAnsweredTriviaActivity.this, R.raw.sosburro).play();
+            }
+        }).play();
+
 
 // Hide after some seconds
         final Handler handler  = new Handler();
@@ -33,6 +39,8 @@ public class BadAnsweredTriviaActivity extends AppCompatActivity {
                 if (alert.isShowing()) {
                     alert.dismiss();
                     exitDialogWrongAnswers();
+                    Intent intent = new Intent(BadAnsweredTriviaActivity.this, SeeQuestionActivity.class);
+                    startActivity(intent);
                 }
             }
         };
@@ -48,24 +56,20 @@ public class BadAnsweredTriviaActivity extends AppCompatActivity {
     }
 
     private void exitDialogWrongAnswers() {
-        videoview = (VideoView) findViewById(R.id.videoView1);
-
-//        videoview.setVideoPath(
-//                "https://docs.google.com/uc?authuser=1&id=0B5QOkF_ymQ_0a2ZtcW5BUmtuV0E&export=download");
-
-        videoview.setVideoURI(Uri.parse("android.resource://com.lagreca.casamiento.casamiento/" + R.raw.wronganswervideo));
-
-//        videoview.setVideoPath("raw/wronganswervideo.3gp");
-
-        videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                Intent intent = new Intent(BadAnsweredTriviaActivity.this, SeeQuestionActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        videoview.start();
+//        videoview = (VideoView) findViewById(R.id.videoView1);
+//
+//        videoview.setVideoURI(Uri.parse("android.resource://com.lagreca.casamiento.casamiento/" + R.raw.wronganswervideo));
+//
+//
+//        videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//            @Override
+//            public void onCompletion(MediaPlayer mediaPlayer) {
+//                Intent intent = new Intent(BadAnsweredTriviaActivity.this, SeeQuestionActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        videoview.start();
 
     }
 }

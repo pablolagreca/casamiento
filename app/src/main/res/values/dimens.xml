@@ -4,4 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="questionFontSize">32dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="shellWidth">340dp</dimen>
+    <dimen name="shellHeight">230dp</dimen>
 </resources>

@@ -4,28 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@drawable/portada"
+    android:onClick="seeQuestions"
+    android:screenOrientation="portrait"
     tools:context="com.lagreca.casamiento.casamiento.MainActivity">
 
-    <ImageView
-        android:src="@drawable/topsecret"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
-    <!--<TextView-->
-        <!--android:textSize="@dimen/questionFontSize"-->
-        <!--android:text="Top Secret!!!. Para ver el contenido del mensaje debera contestar algunas preguntas."-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_centerInParent="true"/>-->
-    <Button
-        android:onClick="seeQuestions"
-        android:text="Ver preguntas"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+    <RelativeLayout
+        android:id="@+id/shellLayout"
+        android:layout_width="@dimen/shellWidth"
+        android:layout_height="@dimen/shellHeight"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:padding="7dp">
+    </RelativeLayout>
+
 </RelativeLayout>

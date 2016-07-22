@@ -1,12 +1,13 @@
 package com.lagreca.casamiento.casamiento;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.widget.VideoView;
 
 public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
@@ -17,6 +18,7 @@ public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_successful_answer_trivia);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Felicitaciones!").setMessage("Has contestado correctamente.  ");
         final AlertDialog alert = dialog.create();
@@ -29,38 +31,56 @@ public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
             public void run() {
                 if (alert.isShowing()) {
                     alert.dismiss();
-                    exitDialogWrongAnswers();
+                    showWeddingVideo();
                 }
             }
         };
 
-        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                handler.removeCallbacks(runnable);
-            }
-        });
-
-        handler.postDelayed(runnable, 5000);
+        handler.postDelayed(runnable, 3000);
     }
 
-    private void exitDialogWrongAnswers() {
-        videoview = (VideoView) findViewById(R.id.videoView1);
+    private void showWeddingVideo() {
 
-        videoview.setVideoPath(
-                "https://docs.google.com/uc?authuser=1&id=0B5QOkF_ymQ_0a2ZtcW5BUmtuV0E&export=download");
+        videoview = (VideoView) findViewById(R.id.videoView2);
 
-//        videoview.setVideoPath("raw/wronganswervideo.3gp");
+        videoview.setVideoURI(Uri.parse("android.resource://com.lagreca.casamiento.casamiento/" + R.raw.weddingvideo));
+
 
         videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-//                Intent intent = new Intent(BadAnsweredTriviaActivity.this, SeeQuestionActivity.class);
-//                startActivity(intent);
+                final AlertDialog.Builder dialog = new AlertDialog.Builder(SuccessfulAnswerTriviaActivity.this).setTitle("").setMessage("Te esperamos!!!");
+                final AlertDialog alert = dialog.create();
+                alert.show();
             }
         });
 
+        //set in full screen
+        DisplayMetrics metrics = new DisplayMetrics(); getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        android.widget.RelativeLayout.LayoutParams params = (android.widget.RelativeLayout.LayoutParams) videoview.getLayoutParams();
+        params.width =  metrics.widthPixels;
+        params.height = metrics.heightPixels;
+        params.leftMargin = 0;
+        videoview.setLayoutParams(params);
+
         videoview.start();
+
+//        videoview = (VideoView) findViewById(R.id.videoView1);
+//
+//        videoview.setVideoPath(
+//                "https://docs.google.com/uc?authuser=1&id=0B5QOkF_ymQ_0a2ZtcW5BUmtuV0E&export=download");
+//
+////        videoview.setVideoPath("raw/wronganswervideo.3gp");
+//
+//        videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//            @Override
+//            public void onCompletion(MediaPlayer mediaPlayer) {
+////                Intent intent = new Intent(BadAnsweredTriviaActivity.this, SeeQuestionActivity.class);
+////                startActivity(intent);
+//            }
+//        });
+//
+//        videoview.start();
 
     }
 }
