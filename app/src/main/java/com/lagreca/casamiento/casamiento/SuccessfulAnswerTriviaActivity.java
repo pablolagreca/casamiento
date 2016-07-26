@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -19,24 +20,12 @@ public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_successful_answer_trivia);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
 
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Felicitaciones!").setMessage("Has contestado correctamente.  ");
-        final AlertDialog alert = dialog.create();
-        alert.show();
-
-// Hide after some seconds
-        final Handler handler  = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (alert.isShowing()) {
-                    alert.dismiss();
-                    showWeddingVideo();
-                }
-            }
-        };
-
-        handler.postDelayed(runnable, 3000);
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        showWeddingVideo();
     }
 
     private void showWeddingVideo() {
@@ -45,6 +34,28 @@ public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
 
         videoview.setVideoURI(Uri.parse("android.resource://com.lagreca.casamiento.casamiento/" + R.raw.weddingvideo));
 
+        videoview.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                int videoWidth = mediaPlayer.getVideoWidth();
+                int videoHeight = mediaPlayer.getVideoHeight();
+                float videoProportion = (float) videoWidth / (float) videoHeight;
+                int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
+                int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
+                float screenProportion = (float) screenWidth / (float) screenHeight;
+
+                android.widget.RelativeLayout.LayoutParams lp = (android.widget.RelativeLayout.LayoutParams) videoview.getLayoutParams();
+
+                if (videoProportion > screenProportion) {
+                    lp.width = screenWidth;
+                    lp.height = (int) ((float) screenHeight / videoProportion);
+                } else {
+                    lp.width = (int) ((float)screenWidth / videoProportion);
+                    lp.height = screenHeight;
+                }
+                videoview.setLayoutParams(lp);
+            }
+        });
 
         videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -55,32 +66,6 @@ public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
             }
         });
 
-        //set in full screen
-        DisplayMetrics metrics = new DisplayMetrics(); getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        android.widget.RelativeLayout.LayoutParams params = (android.widget.RelativeLayout.LayoutParams) videoview.getLayoutParams();
-        params.width =  metrics.widthPixels;
-        params.height = metrics.heightPixels;
-        params.leftMargin = 0;
-        videoview.setLayoutParams(params);
-
         videoview.start();
-
-//        videoview = (VideoView) findViewById(R.id.videoView1);
-//
-//        videoview.setVideoPath(
-//                "https://docs.google.com/uc?authuser=1&id=0B5QOkF_ymQ_0a2ZtcW5BUmtuV0E&export=download");
-//
-////        videoview.setVideoPath("raw/wronganswervideo.3gp");
-//
-//        videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//            @Override
-//            public void onCompletion(MediaPlayer mediaPlayer) {
-////                Intent intent = new Intent(BadAnsweredTriviaActivity.this, SeeQuestionActivity.class);
-////                startActivity(intent);
-//            }
-//        });
-//
-//        videoview.start();
-
     }
 }

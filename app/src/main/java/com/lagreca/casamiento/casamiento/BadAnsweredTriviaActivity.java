@@ -3,9 +3,11 @@ package com.lagreca.casamiento.casamiento;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.VideoView;
@@ -18,10 +20,13 @@ public class BadAnsweredTriviaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bad_answered_trivia);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+    }
 
-        final AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Respuesta/s incorrectas!!!!").setMessage("Lamentablemente no conoces a los novios lo suficiente. \nHasta no contestar bien no podras ver el mensaje secreto. Volve a intentarlo!");
-        final AlertDialog alert = dialog.create();
-        alert.show();
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
         new SoundProducer(this, R.raw.fallochiste).onComplete(new Runnable() {
             @Override
@@ -36,21 +41,21 @@ public class BadAnsweredTriviaActivity extends AppCompatActivity {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                if (alert.isShowing()) {
-                    alert.dismiss();
+//                if (alert.isShowing()) {
+//                    alert.dismiss();
                     exitDialogWrongAnswers();
                     Intent intent = new Intent(BadAnsweredTriviaActivity.this, SeeQuestionActivity.class);
                     startActivity(intent);
-                }
+//                }
             }
         };
 
-        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                handler.removeCallbacks(runnable);
-            }
-        });
+//        alert.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//            @Override
+//            public void onDismiss(DialogInterface dialog) {
+//                handler.removeCallbacks(runnable);
+//            }
+//        });
 
         handler.postDelayed(runnable, 5000);
     }

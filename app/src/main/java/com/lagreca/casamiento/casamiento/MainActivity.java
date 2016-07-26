@@ -1,6 +1,7 @@
 package com.lagreca.casamiento.casamiento;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
@@ -35,82 +36,52 @@ public class MainActivity extends AppCompatActivity {
     private SoundProducer gadgetSoundProducer;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        gadgetSoundProducer = new SoundProducer(this, R.raw.gadget);
-        gadgetSoundProducer.loop().play();
+    protected void onStop() {
+        super.onStop();
+        gadgetSoundProducer.pause();
     }
 
     @Override
-    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
+    protected void onPause() {
+        super.onPause();
+        gadgetSoundProducer.pause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        gadgetSoundProducer.stop();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        gadgetSoundProducer.play();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+        gadgetSoundProducer = new SoundProducer(this, R.raw.gadget);
+        gadgetSoundProducer.loop().play();
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 RelativeLayout shellLayout = (RelativeLayout) findViewById(R.id.shellLayout);
-//                shellLayout.setBackgroundColor(Color.BLACK);
 
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
-
-                final TextView textView = new TextView(MainActivity.this);
-                textView.setBackgroundResource(R.drawable.rounded_border_text_view);
-//                textView.setBackgroundColor(Color.BLACK);
-                textView.setTextColor(Color.WHITE);
-                textView.setPadding(100, 100, 100, 100);
-                textView.setLayoutParams(params);
-                shellLayout.addView(textView);
-
-                final Queue<Character> queue = new LinkedList();
-                for (int i = 0; i < mensaje.length(); i ++)
-                {
-                    queue.offer(mensaje.charAt(i));
-                }
-
-                final Random random = new Random(System.currentTimeMillis());
-
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        Character character = queue.poll();
-                        if (character != null)
-                        {
-                            SpannableString spanString = new SpannableString(String.valueOf(character));
-                            spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, 0);
-                            textView.append(spanString);
-                            int timeToWait = random.nextInt(50) + 50;
-                            if (".".equals(String.valueOf(textView.getText().charAt(textView.getText().length() - 1))))
-                            {
-                                timeToWait = 600;
+                new ShellMessageHelper().createShellMessageTextView(MainActivity.this,
+                        shellLayout,
+                        mensaje,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                messageShown.set(true);
                             }
-                            new Handler().postDelayed(this, timeToWait);
-                        }
-                        else
-                        {
-                            messageShown.set(true);
-//                            new Handler().postDelayed(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    if (".".equals(String.valueOf(textView.getText().charAt(textView.length() - 1))))
-//                                    {
-//                                        CharSequence text = textView.getText();
-//                                        text = text.subSequence(0, text.length() - 2);
-//                                        SpannableString spanString = new SpannableString(String.valueOf(text));
-//                                        spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, 0);
-//                                        textView.append(spanString);
-//
-//                                    }
-//                                    else
-//                                    {
-//                                        textView.append(".");
-//                                    }
-//                                }
-//                            }, 200);
-                        }
-                    }
-                };
-                new Handler().postDelayed(runnable, 100);
+                        });
             }
         }, 5000);
     }
@@ -119,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
 //        if (messageShown.get())
 //        {
         gadgetSoundProducer.stop();
-            Intent intent = new Intent(this, SeeQuestionActivity.class);
-            startActivity(intent);
+        Intent intent = new Intent(this, SeeQuestionActivity.class);
+        startActivity(intent);
 //        }
     }
 }

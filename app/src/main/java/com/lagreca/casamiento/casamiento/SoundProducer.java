@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
  */
 public class SoundProducer {
 
-    private final MediaPlayer mPlayer;
+    private MediaPlayer mPlayer;
 
     public SoundProducer(AppCompatActivity activity, int soundId)
     {
@@ -38,7 +38,23 @@ public class SoundProducer {
         return this;
     }
 
-    public void stop() {
-        mPlayer.stop();
+    public SoundProducer pause()
+    {
+        if (mPlayer != null)
+        {
+            mPlayer.pause();
+        }
+        return this;
     }
+
+    public SoundProducer stop() {
+        if (mPlayer != null)
+        {
+            mPlayer.stop();
+            mPlayer.release();
+            mPlayer = null;
+        }
+        return this;
+    }
+
 }
