@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 public class SoundProducer {
 
     private MediaPlayer mPlayer;
+    private boolean isStopped;
 
     public SoundProducer(AppCompatActivity activity, int soundId)
     {
@@ -17,7 +18,10 @@ public class SoundProducer {
 
     public SoundProducer play()
     {
-        mPlayer.start();
+        if (!this.isStopped)
+        {
+            mPlayer.start();
+        }
         return this;
     }
 
@@ -48,6 +52,7 @@ public class SoundProducer {
     }
 
     public SoundProducer stop() {
+        this.isStopped = true;
         if (mPlayer != null)
         {
             mPlayer.stop();

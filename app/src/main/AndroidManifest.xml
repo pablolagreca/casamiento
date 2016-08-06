@@ -23,11 +23,6 @@
             android:name=".BadAnsweredTriviaActivity"
             android:label="@string/title_activity_bad_answered_trivia"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".SuccessfulAnswerTriviaActivity"></activity>
     </application>

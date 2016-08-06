@@ -2,15 +2,18 @@ package com.lagreca.casamiento.casamiento;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.v7.app.ActionBar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,11 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static java.lang.Math.max;
 import static java.util.Collections.shuffle;
 
 public class SeeQuestionActivity extends AppCompatActivity {
 
-    private static final int NUMBER_OF_QUESTIONS_TO_ASK = 3;
+    private static final int NUMBER_OF_QUESTIONS_TO_ASK = 5;
 
     private Question currentQuestion;
     private int nextQuestionIndex = 0;
@@ -32,6 +36,8 @@ public class SeeQuestionActivity extends AppCompatActivity {
     private SoundProducer bennyHillSoundProducer;
     private SoundProducer criCriCriSoundProducer;
     private Handler handler;
+    private MyCountDownTimer myCountDownTimer;
+    private boolean showingDialog;
 
 
     @Override
@@ -50,6 +56,8 @@ public class SeeQuestionActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         bennyHillSoundProducer.stop();
+        this.finish();
+        System.exit(0);
     }
 
     @Override
@@ -70,7 +78,7 @@ public class SeeQuestionActivity extends AppCompatActivity {
 
     private Question[] questions = new Question[]
             {
-                    new Question("¿En que lugar se conocieron los novios?", new Answer("Boliche"), new Answer("Colacion"), new Answer("Cumpleaños", true)),
+                    new Question("¿En que evento se conocieron los novios?", new Answer("Boliche"), new Answer("Colacion"), new Answer("Cumpleaños", true)),
                     new Question("¿En que año se conocieron los novios?", new Answer("2002"), new Answer("2006"), new Answer("2008", true)),
                     new Question("¿Que disfrutan hacer los novios en su tiempo libre?", new Answer("Ver peliculas", true), new Answer("Ir a bailar"), new Answer("Salir a comer")),
                     new Question("¿Cual es el lugar preferido para vacacionar de los novios?", new Answer("Playa", true), new Answer("Montaña"), new Answer("Nieve")),
@@ -85,39 +93,48 @@ public class SeeQuestionActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         shuffleArray(questions);
         setContentView(R.layout.activity_see_question);
         recreatePhotoIdentifiers();
+        myCountDownTimer = new MyCountDownTimer(15000l, 1000l, (TextView) findViewById(R.id.timer));
         addNextQuestionAndReturnIfThereAreMoreQuestions();
         bennyHillSoundProducer = new SoundProducer(this, R.raw.bennyhill).loop().play();
         handler = new Handler();
     }
 
     private boolean addNextQuestionAndReturnIfThereAreMoreQuestions() {
-        if (nextQuestionIndex >= questions.length || nextQuestionIndex >= NUMBER_OF_QUESTIONS_TO_ASK) {
+        if (nextQuestionIndex >= questions.length || nextQuestionIndex >= NUMBER_OF_QUESTIONS_TO_ASK || incorrectAnswers > 0) {
             return false;
         }
         TextView questionTextView = (TextView) findViewById(R.id.content);
         currentQuestion = questions[nextQuestionIndex++];
-        questionTextView.setText(currentQuestion.getText());
+        questionTextView.setText(String.format("[%s/%s]\n%s", nextQuestionIndex, NUMBER_OF_QUESTIONS_TO_ASK, currentQuestion.getText()));
+        questionTextView.setGravity(1);
 
-        LinearLayout canvasLinearLayout = (LinearLayout) findViewById(R.id.buttonLayout);
-        canvasLinearLayout.removeAllViews();
+        myCountDownTimer.start();
+
+        GridLayout canvasGridLayout = (GridLayout) findViewById(R.id.buttonLayout);
+        canvasGridLayout.setRowCount(currentQuestion.getAnswers().length);
+        canvasGridLayout.removeAllViews();
 
         setBackgroundImage();
 
+        List<Button> buttons = new ArrayList<>();
+        int maxTextLenght = 0;
         for (Answer answer : currentQuestion.getAnswers()) {
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
-            params.setLayoutDirection(LinearLayout.HORIZONTAL);
-
             Button button = new Button(this);
-            button.setLayoutParams(params);
+            buttons.add(button);
+//            button.setBackgroundResource(R.color.darkBlue);
+//            button.setBackgroundColor(colorStateList.getDefaultColor());
+//            button.setBackgroundColor(getResources().getColor(R.color.darkBlue));
             button.setTextColor(Color.WHITE);
+            button.setPadding(0, 10, 0, 10);
             button.setText(answer.getText());
-            canvasLinearLayout.addView(button);
+            canvasGridLayout.addView(button);
             final Question criCriCriForQuestion = currentQuestion;
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -132,6 +149,11 @@ public class SeeQuestionActivity extends AppCompatActivity {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if (showingDialog) {
+                            return;
+                        }
+                        myCountDownTimer.cancel();
+                        myCountDownTimer.reset();
                         disableCriCriSoundProducer();
                         questionCorrectlyAnswered(view);
                     }
@@ -140,11 +162,21 @@ public class SeeQuestionActivity extends AppCompatActivity {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if (showingDialog) {
+                            return;
+                        }
+                        myCountDownTimer.cancel();
+                        myCountDownTimer.reset();
                         disableCriCriSoundProducer();
                         questionIncorrectlyAnswered(view);
                     }
                 });
             }
+            maxTextLenght = max(answer.getText().length(), maxTextLenght);
+        }
+        for (Button button : buttons) {
+            GridLayout.LayoutParams params = (GridLayout.LayoutParams) button.getLayoutParams();
+            params.width = 600;
         }
         return true;
     }
@@ -163,7 +195,7 @@ public class SeeQuestionActivity extends AppCompatActivity {
 
     private void questionIncorrectlyAnswered(View view) {
         incorrectAnswers++;
-        processNextQuestionOrTriviaResult();
+        showIncorrectAnswerDialog();
     }
 
     private void processNextQuestionOrTriviaResult() {
@@ -171,50 +203,62 @@ public class SeeQuestionActivity extends AppCompatActivity {
         if (!moreQuestions) {
             bennyHillSoundProducer.pause();
             if (incorrectAnswers > 0) {
-                incorrectAnswers = 0;
-                nextQuestionIndex = 0;
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        RelativeLayout shellLayout = (RelativeLayout) findViewById(R.id.shellLayoutSeeQuestion);
-                        shellLayout.bringToFront();
-                        new ShellMessageHelper().createShellMessageTextView(SeeQuestionActivity.this,
-                                shellLayout,
-                                "Lamentablemente no conoces a los novios lo suficiente. \nHasta no contestar bien no podras ver el mensaje secreto. Volve a intentarlo!",
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        bennyHillSoundProducer.play();
-                                        Intent intent = new Intent(SeeQuestionActivity.this, SeeQuestionActivity.class);
-                                        startActivity(intent);
-                                    }
-                                });
-                    }
-                });
-
-                new SoundProducer(this, R.raw.fallochiste).onComplete(new Runnable() {
-                    @Override
-                    public void run() {
-                        new SoundProducer(SeeQuestionActivity.this, R.raw.sosburro).play();
-                    }
-                }).play();
+                showIncorrectAnswerDialog();
             } else {
+                showingDialog = true;
+                Intent intent = new Intent(SeeQuestionActivity.this, SuccessfulAnswerTriviaActivity.class);
+                startActivity(intent);
+//                RelativeLayout shellLayout = (RelativeLayout) findViewById(R.id.shellLayoutSeeQuestion);
+//                shellLayout.bringToFront();
+//                new ShellMessageHelper().createShellMessageTextView(SeeQuestionActivity.this,
+//                        shellLayout,
+//                        "Y aqui comienza el vivieron felices para siempre...",
+//                        new Runnable() {
+//                            @Override
+//                            public void run() {
+//
+//                            }
+//                        }, null);
+
+            }
+        }
+    }
+
+    private void showIncorrectAnswerDialog() {
+        incorrectAnswers = 0;
+        nextQuestionIndex = 0;
+        showingDialog = true;
+        myCountDownTimer.cancel();
+        bennyHillSoundProducer.stop();
+        if (criCriCriSoundProducer != null)
+        {
+            criCriCriSoundProducer.stop();
+        }
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
                 RelativeLayout shellLayout = (RelativeLayout) findViewById(R.id.shellLayoutSeeQuestion);
                 shellLayout.bringToFront();
                 new ShellMessageHelper().createShellMessageTextView(SeeQuestionActivity.this,
                         shellLayout,
-                        "Y aqui comienza el vivieron felices para siempre...",
+                        "Lamentablemente no conoces a los novios lo suficiente. \nVolve a intentarlo!",
                         new Runnable() {
                             @Override
                             public void run() {
-                                Intent intent = new Intent(SeeQuestionActivity.this, SuccessfulAnswerTriviaActivity.class);
+                                Intent intent = new Intent(SeeQuestionActivity.this, SeeQuestionActivity.class);
                                 startActivity(intent);
                             }
-                        });
-
+                        }, 10);
             }
-        }
+        });
+
+        new SoundProducer(this, R.raw.fallochiste).onComplete(new Runnable() {
+            @Override
+            public void run() {
+                new SoundProducer(SeeQuestionActivity.this, R.raw.sosburro).play();
+            }
+        }).play();
     }
 
     static void shuffleArray(Question[] ar) {
@@ -231,5 +275,28 @@ public class SeeQuestionActivity extends AppCompatActivity {
 
     public void questionCorrectlyAnswered(View view) {
         processNextQuestionOrTriviaResult();
+    }
+
+    public class MyCountDownTimer extends CountDownTimer {
+        private final TextView textView;
+
+        public MyCountDownTimer(long startTime, long interval, TextView textView) {
+            super(startTime, interval);
+            this.textView = textView;
+        }
+
+        @Override
+        public void onFinish() {
+            showIncorrectAnswerDialog();
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            textView.setText("" + (int) (Math.ceil(millisUntilFinished / 1000f) - 1));
+        }
+
+        public void reset() {
+            this.cancel();
+        }
     }
 }

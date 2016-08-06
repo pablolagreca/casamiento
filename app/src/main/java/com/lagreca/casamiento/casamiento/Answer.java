@@ -22,6 +22,10 @@ public class Answer {
         return correct;
     }
 
+    public void setText(String text) {
+        this.text = text;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

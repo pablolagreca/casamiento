@@ -29,8 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MainActivity extends AppCompatActivity {
 
     private String mensaje = "Se aproxima una fecha muy especial para nosotros y pensamos que la mejor " +
-            "manera de empezar a vivirla es desafiandote a ver cuanto conoces de nuestra historia. " +
-            "Empeza a divertite contestantdo algunas pregunta. Descubri que tan importante sos para nosotros.";
+            "manera de empezar a vivirla es desafiandote a ver cuanto conoces de nuestra historia. #" +
+            "Empeza a divertirte contestando algunas preguntas y descubri que tan importante sos para nosotros.\n Haz click aqui y comenza!.";
 
     private AtomicBoolean messageShown = new AtomicBoolean(false);
     private SoundProducer gadgetSoundProducer;
@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         gadgetSoundProducer.stop();
+        this.finish();
+        System.exit(0);
     }
 
     @Override
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         gadgetSoundProducer = new SoundProducer(this, R.raw.gadget);
@@ -81,17 +85,17 @@ public class MainActivity extends AppCompatActivity {
                             public void run() {
                                 messageShown.set(true);
                             }
-                        });
+                        }, null);
             }
         }, 5000);
     }
 
     public void seeQuestions(View view) {
-//        if (messageShown.get())
-//        {
-        gadgetSoundProducer.stop();
-        Intent intent = new Intent(this, SeeQuestionActivity.class);
-        startActivity(intent);
-//        }
+        if (messageShown.get())
+        {
+            gadgetSoundProducer.stop();
+            Intent intent = new Intent(this, SeeQuestionActivity.class);
+            startActivity(intent);
+        }
     }
 }
