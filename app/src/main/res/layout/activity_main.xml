@@ -17,6 +17,30 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:padding="7dp">
+        <Button
+            android:id="@+id/playagain"
+            android:layout_width="@dimen/mainButtonWidth"
+            android:layout_height="@dimen/mainButtonHeight"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Volver a jugar"
+            android:textColor="@color/white"
+            android:onClick="seeQuestions"
+            android:background="@drawable/rounded_button_bg"
+            android:visibility="invisible"/>
+        <Button
+            android:id="@+id/seeVideo"
+            android:layout_width="@dimen/mainButtonWidth"
+            android:layout_height="@dimen/mainButtonHeight"
+            android:text="Ver video"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:onClick="seeVideo"
+            android:layout_below="@id/playagain"
+            android:background="@drawable/rounded_button_bg"
+            android:textColor="@color/white"
+            android:visibility="invisible"/>
     </RelativeLayout>
 
 </RelativeLayout>

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Top secret</string>
     <string name="title_activity_bad_answered_trivia">BadAnsweredTriviaActivity</string>
+    <string name="videoSeenKey">com.lagreca.casamiento.casamiento.videoseen</string>
 </resources>

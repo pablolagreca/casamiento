@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lagreca.casamiento.casamiento">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!--<uses-permission android:name="android.permission.INTERNET" />-->
 
     <application
         android:debuggable="true"
@@ -24,7 +24,7 @@
             android:label="@string/title_activity_bad_answered_trivia"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".SuccessfulAnswerTriviaActivity"></activity>
+        <activity android:name=".SuccessfulAnswerTriviaActivity" android:configChanges="orientation|keyboardHidden|screenSize"></activity>
     </application>
 
 </manifest>

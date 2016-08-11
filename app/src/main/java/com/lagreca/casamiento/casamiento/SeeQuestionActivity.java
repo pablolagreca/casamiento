@@ -78,16 +78,16 @@ public class SeeQuestionActivity extends AppCompatActivity {
 
     private Question[] questions = new Question[]
             {
-                    new Question("¿En que evento se conocieron los novios?", new Answer("Boliche"), new Answer("Colacion"), new Answer("Cumpleaños", true)),
-                    new Question("¿En que año se conocieron los novios?", new Answer("2002"), new Answer("2006"), new Answer("2008", true)),
-                    new Question("¿Que disfrutan hacer los novios en su tiempo libre?", new Answer("Ver peliculas", true), new Answer("Ir a bailar"), new Answer("Salir a comer")),
-                    new Question("¿Cual es el lugar preferido para vacacionar de los novios?", new Answer("Playa", true), new Answer("Montaña"), new Answer("Nieve")),
-                    new Question("¿Quien ficho a quien?", new Answer("Pablo a Noelia"), new Answer("Noelia a Pablo", true), new Answer("Ambos a la vez")),
-                    new Question("¿Como llama el novio a la novia cariñosamente?", new Answer("Pupi"), new Answer("Mamu", true), new Answer("Chuli")),
+                    new Question("¿En qué evento se conocieron los novios?", new Answer("Boliche"), new Answer("Colación"), new Answer("Cumpleaños", true)),
+                    new Question("¿En qué año se conocieron los novios?", new Answer("2002"), new Answer("2006"), new Answer("2008", true)),
+                    new Question("¿Qué disfrutan hacer los novios en su tiempo libre?", new Answer("Ver películas", true), new Answer("Ir a bailar"), new Answer("Salir a comer")),
+                    new Question("¿Cuál es el lugar preferido para vacacionar de los novios?", new Answer("Playa", true), new Answer("Montaña"), new Answer("Nieve")),
+                    new Question("¿Quién ficho a quien?", new Answer("Pablo a Noelia"), new Answer("Noelia a Pablo", true), new Answer("Ambos a la vez")),
+                    new Question("¿Cómo llama el novio a la novia cariñosamente?", new Answer("Pupi"), new Answer("Mamu", true), new Answer("Chuli")),
 //                    new Question("¿Como se llaman las madres de los novios?", new Answer("Julia y Raquel"), new Answer("Liliana y Beatriz"), new Answer("Raquel y Julia"), new Answer("Liliana y Raquel", true))
-                    new Question("¿Cuantos años hace que se conoce la pareja?", new Answer("6"), new Answer("7"), new Answer("8", true)),
-                    new Question("¿Donde fue la primera salida de los novios?", new Answer("Al cine", true), new Answer("A cenar"), new Answer("A bailar")),
-                    new Question("¿Que tipo de comida prefieren los novios?", new Answer("China"), new Answer("Arabe"), new Answer("Mexicana", true)),
+                    new Question("¿Cuántos años hace que se conoce la pareja?", new Answer("6"), new Answer("7"), new Answer("8", true)),
+                    new Question("¿Dónde fue la primera salida de los novios?", new Answer("Al cine", true), new Answer("A cenar"), new Answer("A bailar")),
+                    new Question("¿Que tipo de comida prefieren los novios?", new Answer("China"), new Answer("Árabe"), new Answer("Mexicana", true)),
             };
 
     @Override
@@ -134,6 +134,7 @@ public class SeeQuestionActivity extends AppCompatActivity {
             button.setTextColor(Color.WHITE);
             button.setPadding(0, 10, 0, 10);
             button.setText(answer.getText());
+            button.setBackground(getResources().getDrawable(R.drawable.rounded_button_bg));
             canvasGridLayout.addView(button);
             final Question criCriCriForQuestion = currentQuestion;
             new Handler().postDelayed(new Runnable() {
@@ -249,7 +250,7 @@ public class SeeQuestionActivity extends AppCompatActivity {
                                 Intent intent = new Intent(SeeQuestionActivity.this, SeeQuestionActivity.class);
                                 startActivity(intent);
                             }
-                        }, 10);
+                        }, 10, true);
             }
         });
 

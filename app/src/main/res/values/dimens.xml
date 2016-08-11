@@ -6,6 +6,8 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="shellWidth">340dp</dimen>
     <dimen name="shellHeight">230dp</dimen>
-    <dimen name="shellTextSize">75dp</dimen>
+    <dimen name="mainButtonWidth">300dp</dimen>
+    <dimen name="mainButtonHeight">50dp</dimen>
+    <dimen name="shellTextSize">110dp</dimen>
     <dimen name="spaceBetweenAnswers">50dp</dimen>
 </resources>

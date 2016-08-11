@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ShellMessageHelper {
 
-    public static void createShellMessageTextView(AppCompatActivity appCompatActivity, RelativeLayout shellLayout, String mensaje, final Runnable onCompleteTask, final Integer timeBetweenCharacters) {
+    public static void createShellMessageTextView(AppCompatActivity appCompatActivity, RelativeLayout shellLayout, String mensaje, final Runnable onCompleteTask, final Integer timeBetweenCharacters, boolean center) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.MATCH_PARENT);
 
@@ -33,6 +34,9 @@ public class ShellMessageHelper {
         textView.setTextColor(Color.WHITE);
         textView.setPadding(100, 100, 100, 100);
         textView.setLayoutParams(params);
+        if (center) {
+            textView.setGravity(Gravity.CENTER);
+        }
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         shellLayout.addView(textView);
 

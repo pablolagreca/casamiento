@@ -1,6 +1,9 @@
 package com.lagreca.casamiento.casamiento;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -14,10 +17,14 @@ import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.lagreca.casamiento.casamiento.AppStateHelper.isVideoSeen;
+import static com.lagreca.casamiento.casamiento.AppStateHelper.setVideoSeen;
 
 public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
 
+    public static final String SHOW_MAIN_VIDEO_PARAMETER = "SHOW_MAIN_VIDEO";
     VideoView videoview;
 
     @Override
@@ -33,7 +40,15 @@ public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        showWeddingVideo();
+        videoview = (VideoView) findViewById(R.id.videoView2);
+        if (getIntent().getBooleanExtra(SHOW_MAIN_VIDEO_PARAMETER, false))
+        {
+            showMainVideo();
+        }
+        else
+        {
+            showWeddingVideo();
+        }
     }
 
     @Override
@@ -44,13 +59,6 @@ public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
     }
 
     private void showWeddingVideo() {
-
-        if (videoview != null)
-        {
-            return;
-        }
-
-        videoview = (VideoView) findViewById(R.id.videoView2);
 
         videoview.setVideoURI(Uri.parse("android.resource://com.lagreca.casamiento.casamiento/" + R.raw.aplausos));
 
@@ -88,21 +96,32 @@ public class SuccessfulAnswerTriviaActivity extends AppCompatActivity {
         videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                videoview.setVideoURI(Uri.parse("android.resource://com.lagreca.casamiento.casamiento/" + R.raw.facebook2));
-                MediaController controller = new MediaController(SuccessfulAnswerTriviaActivity.this);
-                controller.setVisibility(VISIBLE);
-                videoview.setMediaController(controller);
-                videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mediaPlayer) {
-                        SuccessfulAnswerTriviaActivity.this.finish();
-                        System.exit(0);
-                    }
-                });
-                videoview.start();
+                showMainVideo();
             }
         });
 
+        videoview.start();
+    }
+
+    private void showMainVideo() {
+        videoview.setVideoURI(Uri.parse("android.resource://com.lagreca.casamiento.casamiento/" + R.raw.facebook2));
+        MediaController controller = new MediaController(SuccessfulAnswerTriviaActivity.this);
+        if (isVideoSeen(SuccessfulAnswerTriviaActivity.this))
+        {
+            controller.setVisibility(VISIBLE);
+        }
+        else
+        {
+            controller.setVisibility(GONE);
+        }
+        videoview.setMediaController(controller);
+        videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                setVideoSeen(SuccessfulAnswerTriviaActivity.this, true);
+                startActivity(new Intent(SuccessfulAnswerTriviaActivity.this, MainActivity.class));
+            }
+        });
         videoview.start();
     }
 }
